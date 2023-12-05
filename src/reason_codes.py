@@ -86,11 +86,14 @@ fraud_generator = ReasonCodeGenerator(fraud_model, thresholds["fraud"], reason_c
 # Example usage for credit scoring
 credit_input_data = {}  # Replace with actual data
 credit_score, credit_reasons = credit_generator.predict_and_explain(credit_input_data)
-print(f"Credit Score: {credit_score}, Reason Codes: {credit_reasons}")
-# Credit Score: 414, Reason Codes: ['High risk for credit lending.', 'Low credit score.']
 
 # Example usage for fraud detection
 fraud_input_data = {}  # Replace with actual data
 fraud_score, fraud_reasons = fraud_generator.predict_and_explain(fraud_input_data)
+
+# Output
+print(f"Credit Score: {credit_score}, Reason Codes: {credit_reasons}")
+# Credit Score: 414, Reason Codes: ['High risk for credit lending.', 'Low credit score.']
+
 print(f"Fraud Score: {fraud_score}, Reason Codes: {fraud_reasons}")
 # Fraud Score: 0.025010755222666936, Reason Codes: ['Low risk of fraud.', 'Transaction is safe.']
