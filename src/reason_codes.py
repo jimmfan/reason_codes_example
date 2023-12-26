@@ -2,56 +2,25 @@ import random
 
 random.seed(42)  # for repeatability
 
-class ReasonCodeGenerator:
-    def __init__(self, model, thresholds, reason_codes):
-        """
-        Initializes the ReasonCodeGenerator.
+from src.mock_models import CreditScoringModel, FraudDetectionModel
 
-        :param model: The predictive model.
-        :param thresholds: A dictionary mapping score ranges to reason codes.
-        :param reason_codes: A dictionary mapping reason codes to their explanations.
-        """
-        self.model = model
-        self.thresholds = thresholds
-        self.reason_codes = reason_codes
+def get_reason_codes(score, thresholds, reason_codes):
+    """
+    Determines rean codes based on the score.
 
-    def predict_and_explain(self, input_data):
-        """
-        Generates a prediction and corresponding reason codes.
-
-        :param input_data: The input data for the model.
-        :return: A tuple of the prediction score and a list of reason codes.
-        """
-        score = self.model.predict(input_data)
-        reasons = self._get_reason_codes(score)
-        return score, reasons
-
-    def _get_reason_codes(self, score):
-        """
-        Determines reason codes based on the score.
-
-        :param score: The model's score.
-        :return: A list of reason codes.
-        """
-        for threshold, codes in self.thresholds.items():
-            if threshold[0] <= score < threshold[1]:
-                return [self.reason_codes[code] for code in codes]
-        return ["No reason code available for this score range."]
-
-
-# Create Mock Models
-class CreditScoringModel:
-    def predict(self, input_data):
-        # Simulates a credit scoring model
-        return random.randint(300, 850)
-
-class FraudDetectionModel:
-    def predict(self, input_data):
-        # Simulates a fraud detection model
-        return random.uniform(0, 1)  # Score between 0 and 1
+    :param score: The model's score.
+    :param thresholds: A dictionary mapping score ranges to reason codes.
+    :param reason_codes: A dictionary mapping reason codes to their explanations.
+    :return: A list of reason codes.
+    """
+    for threshold, codes in thresholds.items():
+        if threshold[0] <= score < threshold[1]:
+            return [reason_codes[code] for code in codes]
+    return ["No reason code available for this score range."]
 
 credit_model = CreditScoringModel()
 fraud_model = FraudDetectionModel()
+
 
 reason_codes = {
     "credit": {
@@ -79,21 +48,13 @@ thresholds = {
     }
 }
 
-credit_generator = ReasonCodeGenerator(credit_model, thresholds["credit"], reason_codes["credit"])
+credit_score = credit_model.predict({})
+fraud_score = fraud_model.predict({})
 
-fraud_generator = ReasonCodeGenerator(fraud_model, thresholds["fraud"], reason_codes["fraud"])
-
-# Example usage for credit scoring
-credit_input_data = {}  # Replace with actual data
-credit_score, credit_reasons = credit_generator.predict_and_explain(credit_input_data)
-
-# Example usage for fraud detection
-fraud_input_data = {}  # Replace with actual data
-fraud_score, fraud_reasons = fraud_generator.predict_and_explain(fraud_input_data)
+credit_reasons = get_reason_codes(credit_model.predict({}), thresholds['credit'], reason_codes['credit'])
+fraud_reasons = get_reason_codes(fraud_model.predict({}), thresholds['fraud'], reason_codes['fraud'])
 
 # Output
 print(f"Credit Score: {credit_score}, Reason Codes: {credit_reasons}")
-# Credit Score: 414, Reason Codes: ['High risk for credit lending.', 'Low credit score.']
 
 print(f"Fraud Score: {fraud_score}, Reason Codes: {fraud_reasons}")
-# Fraud Score: 0.025010755222666936, Reason Codes: ['Low risk of fraud.', 'Transaction is safe.']
